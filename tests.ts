@@ -430,3 +430,158 @@ Object.entries(voituresParCategorieEconomie)
     });
 
 console.log("\n=== FIN DES EXEMPLES ===");
+
+import aapl from "./aapl.json" with { type: 'json' };
+
+console.log("=== EXEMPLES DES MÉTHODES ARRAY AVEC LES DONNÉES AAPL ===\n");
+console.log(`Nombre total de jours de cotation: ${aapl.length}\n`);
+
+// ===== MÉTHODES D'ACCÈS AUX ÉLÉMENTS =====
+console.log("--- MÉTHODES D'ACCÈS AUX ÉLÉMENTS ---");
+console.log("• at() - Premier jour:", aapl.at(0)?.Date);
+console.log("• at() - Dernier jour:", aapl.at(-1)?.Date);
+console.log("• slice() - Les 3 premiers jours:", aapl.slice(0, 3).map(d => d.Date));
+console.log();
+
+// ===== MÉTHODES DE RECHERCHE ET VÉRIFICATION =====
+console.log("--- MÉTHODES DE RECHERCHE ET VÉRIFICATION ---");
+const firstHighDay = aapl.find(d => d.High > 180);
+console.log("• find() - Premier jour avec High > 180:", firstHighDay?.Date);
+
+const indexBigVolume = aapl.findIndex(d => d.Volume > 150_000_000);
+console.log("• findIndex() - Index du premier jour avec Volume > 150M:", indexBigVolume);
+
+const datesList = aapl.map(d => d.Date);
+console.log("• indexOf() - Index du 2013-05-13:", datesList.indexOf("2013-05-13T00:00:00.000Z"));
+console.log("• lastIndexOf() - Dernier index du 2018-05-11:", datesList.lastIndexOf("2018-05-11T00:00:00.000Z"));
+console.log("• includes() - Existe-t-il le 2014-01-02?", datesList.includes("2014-01-02T00:00:00.000Z"));
+
+const hasVeryLow = aapl.some(d => d.Low < 60);
+console.log("• some() - Y a-t-il des jours avec Low < 60?", hasVeryLow);
+
+const allHaveVolume = aapl.every(d => d.Volume > 0);
+console.log("• every() - Tous ont un volume > 0?", allHaveVolume);
+console.log();
+
+// ===== MÉTHODES DE FILTRAGE =====
+console.log("--- MÉTHODES DE FILTRAGE ---");
+const highCloseDays = aapl.filter(d => d.Close > 180);
+console.log("• filter() - Nombre de jours Close > 180:", highCloseDays.length);
+
+const bigVolumeDays = aapl.filter(d => d.Volume > 100_000_000);
+console.log("• filter() - Jours avec Volume > 100M:", bigVolumeDays.length);
+console.log();
+
+// ===== MÉTHODES DE TRANSFORMATION =====
+console.log("--- MÉTHODES DE TRANSFORMATION ---");
+const daySummaries = aapl.slice(0, 3).map(d =>
+    `${d.Date}: Open ${d.Open}, Close ${d.Close}, Volume ${d.Volume}`
+);
+console.log("• map() - Résumés des 3 premiers jours:");
+daySummaries.forEach(desc => console.log("  ", desc));
+
+const uniqueYears = [...new Set(aapl.map(d => d.Date.slice(0, 4)))];
+console.log("• map() + Set - Années uniques:", uniqueYears);
+
+const openClosePairs = aapl.slice(0, 2).flatMap(d => [d.Open, d.Close]);
+console.log("• flatMap() - Open et Close aplatis:", openClosePairs);
+
+const totalVolume = aapl.reduce((total, d) => total + d.Volume, 0);
+console.log("• reduce() - Volume total:", totalVolume);
+
+const countByYear = aapl.reduce((acc, d) => {
+    const year = d.Date.slice(0, 4);
+    acc[year] = (acc[year] || 0) + 1;
+    return acc;
+}, {} as Record<string, number>);
+console.log("• reduce() - Comptage par année:", countByYear);
+
+const lastDates = aapl.slice(-3).reduceRight((acc, d) => acc + d.Date + " ", "");
+console.log("• reduceRight() - 3 dernières dates (inversées):", lastDates.trim());
+console.log();
+
+// ===== MÉTHODES DE TRI =====
+console.log("--- MÉTHODES DE TRI ---");
+const closesCopy = aapl.slice(0, 5).map(d => d.Close);
+console.log("• sort() - Closes avant tri:", closesCopy);
+closesCopy.sort((a, b) => a - b);
+console.log("• sort() - Closes après tri croissant:", closesCopy);
+
+const sortedByDate = aapl.slice(0, 10).sort((a, b) => a.Date.localeCompare(b.Date));
+console.log("• sort() - 10 premiers triés par date:");
+sortedByDate.forEach(d => console.log(`  ${d.Date} - Close: ${d.Close}`));
+console.log();
+
+// ===== MÉTHODES D'ITÉRATION =====
+console.log("--- MÉTHODES D'ITÉRATION ---");
+console.log("• forEach() - Affichage des 3 premiers jours:");
+aapl.slice(0, 3).forEach((d, index) => {
+    console.log(`  ${index + 1}. ${d.Date}: Open ${d.Open}, Close ${d.Close}`);
+});
+console.log();
+
+// ===== MÉTHODES DE CONVERSION =====
+console.log("--- MÉTHODES DE CONVERSION ---");
+const firstDates = aapl.slice(0, 5).map(d => d.Date);
+console.log("• join() - Dates séparées par ' | ':", firstDates.join(" | "));
+console.log("• join() - Dates séparées par des virgules:", firstDates.join(", "));
+console.log("• toString() - Premiers volumes:", aapl.slice(0, 3).map(d => d.Volume).toString());
+console.log();
+
+// ===== MÉTHODES DE CONCATÉNATION =====
+console.log("--- MÉTHODES DE CONCATÉNATION ---");
+const days2013 = aapl.filter(d => d.Date.startsWith("2013")).slice(0, 2);
+const days2018 = aapl.filter(d => d.Date.startsWith("2018")).slice(0, 2);
+const mixedDays = days2013.concat(days2018);
+console.log("• concat() - Mélange jours 2013 + 2018:");
+mixedDays.forEach(d => console.log(`  ${d.Date} (Close: ${d.Close})`));
+console.log();
+
+// ===== MÉTHODES D'APLATISSEMENT =====
+console.log("--- MÉTHODES D'APLATISSEMENT ---");
+const groupsByYear = [
+    aapl.filter(d => d.Date.startsWith("2013")).slice(0, 2).map(d => d.Date),
+    aapl.filter(d => d.Date.startsWith("2014")).slice(0, 2).map(d => d.Date),
+    aapl.filter(d => d.Date.startsWith("2015")).slice(0, 2).map(d => d.Date)
+];
+console.log("• flat() - Groupes par année avant aplatissement:", groupsByYear);
+console.log("• flat() - Après aplatissement:", groupsByYear.flat());
+console.log();
+
+// ===== STATISTIQUES FINALES =====
+console.log("--- STATISTIQUES FINALES ---");
+const closes = aapl.map(d => d.Close);
+const totalClose = closes.reduce((sum, c) => sum + c, 0);
+const avgClose = totalClose / closes.length;
+const minClose = Math.min(...closes);
+const maxClose = Math.max(...closes);
+
+console.log("• Statistiques des clôtures:");
+console.log(`  - Moyenne: ${avgClose.toFixed(2)}`);
+console.log(`  - Min: ${minClose}`);
+console.log(`  - Max: ${maxClose}`);
+
+const volumeByYear = aapl.reduce((acc, d) => {
+    const year = d.Date.slice(0, 4);
+    acc[year] = (acc[year] || 0) + d.Volume;
+    return acc;
+}, {} as Record<string, number>);
+console.log("• Volume total par année:", volumeByYear);
+
+const countByMonth = aapl.reduce((acc, d) => {
+    const month = d.Date.slice(0, 7);
+    acc[month] = (acc[month] || 0) + 1;
+    return acc;
+}, {} as Record<string, number>);
+console.log("• Comptage par mois:", countByMonth);
+
+// =============================================
+// GROUPEMENT DES DONNÉES AVEC Object.groupBy
+// =============================================
+console.log("\n--- GROUPEMENT AVEC Object.groupBy ---");
+const daysByYear = Object.groupBy(aapl, d => d.Date.slice(0, 4));
+for (const [year, days] of Object.entries(daysByYear)) {
+    console.log(`  ${year}: ${days?.length || 0} jours`);
+}
+
+console.log("\n=== FIN DES EXEMPLES ===");
